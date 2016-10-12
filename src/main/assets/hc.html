@@ -1,0 +1,181 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script>
+
+fixDate = function(dateIn) {
+    var dat = new Date(dateIn);
+    return Date.UTC(dat.getFullYear(), dat.getMonth(), dat.getDate());
+}
+
+
+getOHLC=function(json)
+{
+
+    var dates = json.Dates || [];
+
+    var elements = json.Elements || [];
+    var chartSeries = [];
+
+    if (elements[0])
+	{
+
+        for (var i = 0, datLen = dates.length; i < datLen; i++)
+		{
+            var dat = fixDate( dates[i] );
+            var pointData =
+			[
+                dat,
+                elements[0].DataSeries['open'].values[i],
+                elements[0].DataSeries['high'].values[i],
+                elements[0].DataSeries['low'].values[i],
+                elements[0].DataSeries['close'].values[i]
+            ];
+            chartSeries.push( pointData );
+        };
+    }
+    return chartSeries;
+}
+
+$(document).ready(function()
+	{
+		var getUrlParameter = function getUrlParameter(sParam)
+		{
+   			 var sPageURL = decodeURIComponent(window.location.search.substring(8));
+            return sPageURL;
+   		 }
+
+
+  		$.ajax({
+				type: "GET",
+				url: "http://www.midyear-freedom-127906.appspot.com/bingSearch.php",
+				data:
+				 {
+ 					 lookup : getUrlParameter
+				 },
+				success: function( data )
+				{
+                    var jsonData = $.parseJSON(data.chart);
+
+					var cleanData=getOHLC(jsonData);
+
+                    $('#chartContainer').highcharts('StockChart',
+                    {
+
+                         title: {
+                                text: jsonData.Elements[0].Symbol +' Stock Value'
+						    	},
+
+					    subtitle:
+							{
+								text: ''
+							},
+
+					    xAxis: {
+								gapGridLineWidth: 0
+							},
+					    yAxis: [{
+								title:
+								{
+										text: "stock value"
+								}
+							}],
+
+    					rangeSelector :
+							{
+									buttons :
+									[
+									            {
+													type : 'week',
+													count : 1,
+													text : '1w'
+												},
+												{
+													type : 'month',
+													count : 1,
+													text : '1m'
+												},
+												{
+													type : 'month',
+													count : 3,
+													text : '3m'
+												},
+												{
+													type : 'month',
+													count : 6,
+													text : '6m'
+												},
+												{
+													type : 'ytd',
+													count : 1,
+													text : 'YTD'
+												},
+												{
+													type : 'year',
+													count : 1,
+													text : '1y'
+												},
+												{
+													type : 'all',
+													count : 1,
+													text : 'All'
+								            	}
+								    ],
+								selected : 0,
+								inputEnabled : false
+							},
+	    				reflow: true,
+
+		    			series :
+		    			[
+		    			    {
+									name : jsonData.Elements[0].Symbol ,
+									type: 'area',
+									data : cleanData,
+					    			gapSize: 5,
+									yAxis : 0,
+									tooltip:
+									{
+						    			valueDecimals: 2,
+						    			pointFormat:  '{series.name}: <b>${point.y}</b><br/>'
+
+							    	},
+									fillColor :
+									{
+														linearGradient : {
+																			x1: 0,
+																			y1: 0,
+																			x2: 0,
+																			y2: 1
+
+																		},
+														stops : [
+																	[0, Highcharts.getOptions().colors[0]],
+																	[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+																]
+									},
+									threshold: null
+
+
+						    }
+						]
+
+			    	});
+
+	             }
+		});
+	});
+
+</script>
+</head>
+<body>
+<div id="chartContainer">
+</div>
+
+</body>
+</html>
