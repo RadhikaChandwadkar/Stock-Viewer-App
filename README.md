@@ -65,7 +65,7 @@ An Auto-complete edit box is provided to enter the stock name or symbol. The use
 Once the user has provided data and selected a result from the autocomplete list he will click on ‘Get Quote’, when validation is done to check that the entered data is valid.
 Once the validation is successful, we get the stock details using the PHP script hosted on Google App Engine, which will return the result in JSON format. The app displays the stock details in a ListView component in the ‘Current’ tab. Furthermore, my PHP script will be responsible for rendering the HighCharts in the ‘Historical’ tab and also rending the news articles in the ‘News’ tab.
  
- **- Implementation**
+**- Implementation**<br>
 **5.1 Search Form**
 The interface consists of the following:
 • An ‘AutoCompleteTextView’ component allowing the user to enter the company name or symbol.
